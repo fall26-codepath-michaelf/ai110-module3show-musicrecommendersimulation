@@ -1,111 +1,69 @@
-# 🎧 Model Card: Music Recommender Simulation
+# 🎧 Model Card: FocusFlow
 
-## 1. Model Name  
+## 1. Model Name
 
-Give your model a short, descriptive name.  
-Example: **VibeFinder 1.0**  
+FocusFlow is a small music recommender simulation.
 
----
+## 2. Goal / Task
 
-## 2. Intended Use  
+The system suggests songs from a small catalog based on a user's favorite
+genre, mood, target energy, and acoustic preference.
 
-Describe what your recommender is designed to do and who it is for. 
+## 3. Data Used
 
-Prompts:  
+The catalog has 17 songs. Each song includes genre, mood, energy, tempo,
+valence, danceability, and acousticness. I added seven songs to make the
+starter catalog more varied. The data does not include lyrics, listening
+history, skips, saves, or feedback from real people.
 
-- What kind of recommendations does it generate  
-- What assumptions does it make about the user  
-- Is this for real users or classroom exploration  
+## 4. Algorithm Summary
 
----
+FocusFlow scores one song at a time. A genre match adds 4 points, a mood match
+adds 3 points, energy closeness adds up to 3 points, and a matching acoustic
+preference adds 1 point. It sorts all songs from highest to lowest score and
+shows the top results with reasons.
 
-## 3. How the Model Works  
+## 5. Observed Behavior / Biases
 
-Explain your scoring approach in simple language.  
+The system works well when a profile has clear genre and mood preferences. For
+a lofi, focused profile, `Focus Flow` ranked first. For a pop, happy profile,
+`Sunrise City` ranked first. Genre has the largest weight, so the system can
+over-favor familiar music and miss songs from other genres that fit the same
+mood or energy.
 
-Prompts:  
+## 6. Evaluation Process
 
-- What features of each song are used (genre, energy, mood, etc.)  
-- What user preferences are considered  
-- How does the model turn those into a score  
-- What changes did you make from the starter logic  
+I tested High-Energy Pop, Chill Lofi, and Deep Intense Rock profiles. The top
+results fit the main genre, mood, and energy preferences: `Sunrise City`,
+`Library Rain`, and `Storm Runner` each ranked first for their matching
+profiles. I also tested a weight shift by cutting the genre score from 4 to 2
+and doubling the maximum energy score from 3 to 6. That made the results more
+energy-focused, but not clearly more accurate, so I restored the original
+weights. The two starter tests pass.
 
-Avoid code here. Pretend you are explaining the idea to a friend who does not program.
+## 7. Intended Use and Non-Intended Use
 
----
+This is for classroom exploration of basic recommendation logic. It can help
+show how a few preferences become a ranked list. It should not be used to make
+real music recommendations or assumptions about a person's taste because the
+catalog and profile are too small.
 
-## 4. Data  
+## 8. Ideas for Improvement
 
-Describe the dataset the model uses.  
+- Add a diversity rule so the top results are not all from one genre.
+- Let users mark songs as saved or skipped, then use that feedback later.
+- Add more songs and more than one mood or genre preference per profile.
 
-Prompts:  
+## 9. Personal Reflection
 
-- How many songs are in the catalog  
-- What genres or moods are represented  
-- Did you add or remove data  
-- Are there parts of musical taste missing in the dataset  
+The biggest learning moment for me was seeing how a small weight change could
+reorder the recommendations. When I made energy more important and genre less
+important, songs with closer energy values moved ahead of some genre matches.
+That made the system feel less like a neutral list and more like a set of
+choices I had built into the rules.
 
----
-
-## 5. Strengths  
-
-Where does your system seem to work well  
-
-Prompts:  
-
-- User types for which it gives reasonable results  
-- Any patterns you think your scoring captures correctly  
-- Cases where the recommendations matched your intuition  
-
----
-
-## 6. Limitations and Bias 
-
-Where the system struggles or behaves unfairly. 
-
-Prompts:  
-
-- Features it does not consider  
-- Genres or moods that are underrepresented  
-- Cases where the system overfits to one preference  
-- Ways the scoring might unintentionally favor some users  
-
----
-
-## 7. Evaluation  
-
-How you checked whether the recommender behaved as expected. 
-
-Prompts:  
-
-- Which user profiles you tested  
-- What you looked for in the recommendations  
-- What surprised you  
-- Any simple tests or comparisons you ran  
-
-No need for numeric metrics unless you created some.
-
----
-
-## 8. Future Work  
-
-Ideas for how you would improve the model next.  
-
-Prompts:  
-
-- Additional features or preferences  
-- Better ways to explain recommendations  
-- Improving diversity among the top results  
-- Handling more complex user tastes  
-
----
-
-## 9. Personal Reflection  
-
-A few sentences about your experience.  
-
-Prompts:  
-
-- What you learned about recommender systems  
-- Something unexpected or interesting you discovered  
-- How this changed the way you think about music recommendation apps  
+AI tools helped me brainstorm features, compare profile results, and check the
+scoring idea. I still needed to read the score reasons and test the output
+myself because a suggested rule can be mathematically valid without matching
+what I want the recommender to do. If I extended this project, I would add more
+user feedback and a diversity rule before adding more complex features.

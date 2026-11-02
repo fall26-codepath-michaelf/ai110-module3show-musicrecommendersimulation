@@ -11,23 +11,59 @@ Your goal is to:
 - Evaluate what your system gets right and wrong
 - Reflect on how this mirrors real world AI recommenders
 
-Replace this paragraph with your own summary of what your version does.
+This version uses a content-based scoring rule to recommend songs that match a
+user's favorite genre, mood, energy level, and acoustic preference. I expanded
+the catalog from 10 to 17 songs so it includes more than the starter set of
+genres and moods. The recommender scores every song, then ranks the
+highest-scoring songs first.
 
 ---
 
 ## How The System Works
 
-Explain your design in plain language.
+Each `Song` stores its title, artist, genre, mood, energy, tempo, valence,
+danceability, and acousticness. I will use genre, mood, energy, and
+acousticness for the first version of the score. A `UserProfile` stores a
+favorite genre, a favorite mood, a target energy level, and whether the user
+likes acoustic music.
 
-Some prompts to answer:
+My starting profile is:
 
-- What features does each `Song` use in your system
-  - For example: genre, mood, energy, tempo
-- What information does your `UserProfile` store
-- How does your `Recommender` compute a score for each song
-- How do you choose which songs to recommend
+```python
+{
+    "favorite_genre": "lofi",
+    "favorite_mood": "focused",
+    "target_energy": 0.45,
+    "likes_acoustic": True,
+}
+```
 
-You can include a simple diagram or bullet list if helpful.
+The scoring rule evaluates one song at a time:
+
+- Matching genre: +4 points
+- Matching mood: +3 points
+- Energy closeness: up to +3 points, with closer energy values earning more
+- Matching acoustic preference: +1 point
+
+Genre receives the most weight because it is the clearest starting signal for
+this profile. Mood and energy then help separate a focused lofi song from an
+intense rock song. The ranking rule sorts every scored song from highest to
+lowest score and returns the top results.
+
+```text
+User preferences
+      ↓
+Score each song in songs.csv
+      ↓
+Sort scores from highest to lowest
+      ↓
+Return the top k recommendations with reasons
+```
+
+This is a small simulation, not a full Spotify-style system. A larger system
+could also use behavior such as listens, skips, saves, and playlists. My rule
+may over-prioritize the favorite genre and miss songs from other genres that
+still fit the user's mood or energy.
 
 ---
 
@@ -71,12 +107,18 @@ You can add more tests in `tests/test_recommender.py`.
 Paste a sample of your recommender's output here as a text block so a reader can see what it produces:
 
 ```
-# e.g.:
-# User profile: genre=indie, mood=chill, energy=low
-# Recommendations:
-#   1. ...
-#   2. ...
-#   3. ...
+Loaded songs: 17
+
+Top recommendations:
+
+Focus Flow - Score: 10.85
+Because: genre match (+4.0); mood match (+3.0); energy close to target (+2.85); acoustic preference match (+1.0)
+
+Midnight Coding - Score: 7.91
+Because: genre match (+4.0); energy close to target (+2.91); acoustic preference match (+1.0)
+
+Library Rain - Score: 7.70
+Because: genre match (+4.0); energy close to target (+2.70); acoustic preference match (+1.0)
 ```
 
 **Screenshot or video** *(optional)*: <!-- Insert a screenshot or demo video link here -->
@@ -85,25 +127,20 @@ Paste a sample of your recommender's output here as a text block so a reader can
 
 ## Experiments You Tried
 
-Use this section to document the experiments you ran. For example:
-
-- What happened when you changed the weight on genre from 2.0 to 0.5
-- What happened when you added tempo or valence to the score
-- How did your system behave for different types of users
+- I tested the default lofi, focused profile. `Focus Flow` ranked first because
+  it matched the genre and mood while staying close to the target energy.
+- I also tested a pop, happy profile with target energy 0.8. `Sunrise City`
+  ranked first, followed by `Gym Hero` and `Rooftop Lights`, which matched my
+  expectation for that profile.
 
 ---
 
 ## Limitations and Risks
 
-Summarize some limitations of your recommender.
-
-Examples:
-
-- It only works on a tiny catalog
-- It does not understand lyrics or language
-- It might over favor one genre or mood
-
-You will go deeper on this in your model card.
+This recommender only works with 17 songs and a few hand-written labels. It
+does not use lyrics, listening history, skips, or feedback from other users.
+Genre has the largest weight, so the system can overlook a song from another
+genre that fits the user's energy and mood.
 
 ---
 
@@ -113,10 +150,16 @@ Read and complete `model_card.md`:
 
 [**Model Card**](model_card.md)
 
-Write 1 to 2 paragraphs here about what you learned:
+Building this version helped me see that a recommender starts with choices about
+what counts as a useful signal. I used genre, mood, energy, and acousticness,
+then turned those choices into points. The ranking was easy to read because
+each score came with reasons, but I can also see how changing one weight can
+shift the whole list.
 
-- about how recommenders turn data into predictions
-- about where bias or unfairness could show up in systems like this
+I also learned that a simple system can be biased by its own design. My
+favorite-genre weight is strong, so it keeps the recommendations close to what
+the profile already likes. A larger system would need more data and a way to
+make room for discovery instead of only repeating the same type of music.
 
 
 
